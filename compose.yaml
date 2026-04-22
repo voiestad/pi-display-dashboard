@@ -1,0 +1,11 @@
+services:
+  pi-display:
+    container_name: pi-display
+    ports:
+      - "3000:3000"
+    restart: always
+    build: .
+    environment:
+      YR_LAT: ${YR_LAT}
+      YR_LON: ${YR_LON}
+      YR_USER_AGENT: ${YR_USER_AGENT}
