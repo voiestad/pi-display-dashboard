@@ -1,41 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { User2Icon, XIcon } from "lucide-react";
+import { XIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { BusLine } from "../types";
 
-function getOccupancy(occupancy: "LOW" | "MEDIUM" | "HIGH" | undefined, size: string) {
-  if (!occupancy) {
-    return (
-      <>
-        <User2Icon className={`stroke-4 text-neutral-700 ${size}`} />
-      </>
-    );
+function formatTime(expected: string, time: Date) {
+  const expectedDate = new Date(expected);
+  const diffMillis = expectedDate.getTime() - time.getTime();
+  const diffMinutes = Math.round(diffMillis / (1000 * 60));
+  if (diffMinutes <= 15 && diffMinutes >= 0) {
+    return `${diffMinutes} min`;
   }
-  switch (occupancy) {
-    case "LOW":
-      return (
-        <>
-          <User2Icon className={`stroke-4 text-green-400 ${size}`} />
-        </>
-      );
-    case "MEDIUM":
-      return (
-        <>
-          <User2Icon className={`stroke-4 size-6 text-orange-400 ${size}`} />
-        </>
-      );
-    case "HIGH":
-      return (
-        <>
-          <User2Icon className={`stroke-4 size-6 text-red-500 ${size}`} />
-        </>
-      );
-  }
+  return expectedDate.toLocaleTimeString("nb-NO", { hour: "2-digit", minute: "2-digit" });
 }
 
-export default function Bus() {
-  const [busTimes, setBusTimes] = useState<null | { busTimes: { name: string; to: string; stop: string; times: { Timestamp: string; TripIdentifier: string; Status: "Early" | "Late" | "Schedule"; DisplayTime: string; Notes: string[]; PredictionInaccurate: string; Passed: boolean; Occupancy?: "LOW" | "MEDIUM" | "HIGH"; }[]; }[]; }>(null);
+export default function Bus({ time: date }: { time: Date }) {
+  const [busTimes, setBusTimes] = useState<null | BusLine[]>(null);
   const [error, setError] = useState<boolean>(false);
   useEffect(() => {
     async function getBusTimes() {
@@ -59,9 +40,9 @@ export default function Bus() {
         <>
           <div className="grid gap-4 p-1 mt-auto mb-auto">
             <div className="grid gap-4 grid-cols-2">
-              {busTimes.busTimes.map((busTime, index) => (
+              {busTimes.map((busLine, index) => (
                 <div
-                  key={`${busTime.name}-${busTime.to}`}
+                  key={busLine.id}
                   className="grid"
                 >
                   <div
@@ -81,17 +62,17 @@ export default function Bus() {
                         </button>
                         <div className="flex flex-col gap-2">
                           <div className="font-bold text-5xl text-nowrap">
-                            {busTime.name} - {busTime.to.split(" ").slice(1).join(" ")}
+                            {busLine.name} - {busLine.to}
                           </div>
                           <div className="text-4xl">
-                            {busTime.stop}
+                            {busLine.stop}
                           </div>
                         </div>
                         <div className="grid gap-4 w-max mx-auto text-5xl font-semibold max-h-96 overflow-hidden">
                           <AnimatePresence initial={false}>
-                            {busTime.times.map(time => (
+                            {busLine.departures.map(departure => (
                               <motion.div
-                                key={`${busTime.name}-${busTime.to}-${time.Timestamp}`}
+                                key={departure.departureId}
                                 layout="position"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
@@ -102,10 +83,7 @@ export default function Bus() {
                                 transition={{ duration: 1 }}
                                 className="grid grid-cols-[auto_auto] items-center gap-4"
                               >
-                                <div className="min-w-40">{time.DisplayTime}</div>
-                                <div>
-                                  {getOccupancy(time.Occupancy, "size-9")}
-                                </div>
+                                <div className="min-w-40">{formatTime(departure.departure.expected, date)}</div>
                               </motion.div>
                             ))}
                           </AnimatePresence>
@@ -118,14 +96,14 @@ export default function Bus() {
                     popoverTarget={`bus-time-${index}`}
                   >
                     <div className="gap-0.5">
-                      <div className="font-bold text-4xl">{busTime.name} - {busTime.to.split(" ").slice(1).join(" ")}</div>
-                      <div className="text text-xl text-neutral-400">{busTime.stop}</div>
+                      <div className="font-bold text-4xl">{busLine.name} - {busLine.to}</div>
+                      <div className="text text-xl text-neutral-400">{busLine.stop}</div>
                     </div>
                     <div className="grid gap-1 w-max mx-auto text-4xl font-semibold max-h-20 overflow-hidden">
                       <AnimatePresence initial={false}>
-                        {busTime.times.slice(0, 2).map(time => (
+                        {busLine.departures.slice(0, 2).map(departure => (
                           <motion.div
-                            key={`${busTime.name}-${busTime.to}-${time.Timestamp}`}
+                            key={departure.departureId}
                             layout="position"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -133,10 +111,7 @@ export default function Bus() {
                             transition={{ duration: 1 }}
                             className="grid grid-cols-[auto_auto] items-center gap-2"
                           >
-                            <div className="min-w-36">{time.DisplayTime}</div>
-                            <div>
-                              {getOccupancy(time.Occupancy, "size-6")}
-                            </div>
+                            <div className="min-w-36">{formatTime(departure.departure.expected, date)}</div>
                           </motion.div>
                         ))}
                       </AnimatePresence>

@@ -1,42 +1,42 @@
+export type Departure = {
+  departureId: string,
+  departure: {
+    aimed: string,
+    expected: string,
+  },
+  transitState: string,
+};
+
 export type SkyssResponse = {
-  resultCode: "SUCCESS" | string,
-  StopGroups: {
-    Identifier: string,
-    Description: string,
-    Location: string,
-    ServiceModes: "Bus" | string[],
-    ServiceModes2: "Bus" | string[],
-    Stops: {
-      Identifier: string,
-      Description: string,
-      Location: string,
-      ServiceModes: string[],
-      SkyssId: string,
-      RouteDirections: {
-        PublicIdentifier: string,
-        Direction: "outbound" | "inbound",
-        DirectionName: string,
-        ServiceMode: "Bus" | string,
-        ServiceMode2: "Bus" | string,
-        Identifier: string,
-        PassingTimes: {
-          Timestamp: string,
-          TripIdentifier: string,
-          Status: "Early" | "Late" | "Schedule",
-          DisplayTime: string,
-          Notes: string[],
-          PredictionInaccurate: string,
-          Passed: boolean,
-          Occupancy?: "LOW" | "MEDIUM" | "HIGH"
-        }[],
-        Notes: []
-      }[],
-      Municipality: string,
-      StopGroupId: string
-    }[],
-    LineCodes: string[],
-    Municipality: string
-  }[]
+  data: {
+    stopPlace_v3: {
+      id: string,
+      name: string,
+      platforms: {
+        __typename: string,
+        id: string,
+        publicCode: string,
+        lineDepartures?: {
+          departures: Departure[],
+          line: {
+            id: string,
+            publicCode: string,
+            name: string,
+            frontText: string,
+            direction: "outbound" | "inbound",
+          }
+        }[]
+      }[]
+    }
+  }
+};
+
+export type BusLine = {
+  id: string;
+  name: string;
+  stop: string;
+  to: string;
+  departures: Departure[];
 };
 
 export type YrResponse = {

@@ -22,7 +22,7 @@ YR_USER_AGENT=<email/other>
 ```
 
 ### Skyss config
-The number for the bus stops can be found at [https://skyss-reise.giantleap.no/v3/stopgroups](https://skyss-reise.giantleap.no/v3/stopgroups). Find the correct name for the bus stop and copy the number: `"Identifier": "NSR:StopPlace:<number>"`. Multiple bus stops can be added, and if they have overlap in bus routes, the first bus stop in the list will be prioritised.
+The number for the bus stops can be found at [https://reise.skyss.no/](https://reise.skyss.no/). Open developer tools and the network tab. Choose to search for departures, search for the bus stop and locate the correct bus stop in the response for the graphql request. Copy the number from: `"id": "NSR:StopPlace:<number>"`. Multiple bus stops can be added, and if they have overlap in bus routes, the first bus stop in the list will be prioritised.
 In skyss-config.json:
 ```json
 {
