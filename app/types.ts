@@ -31,6 +31,29 @@ export type SkyssResponse = {
   }
 };
 
+export type SkyssResponse2 = {
+  data: {
+    stopPlace_v3: {
+      id: string,
+      name: string,
+      platforms: {
+        __typename: string,
+        id: string,
+        publicCode: string,
+        lineDepartures?: {
+          line: {
+            id: string,
+            publicCode: string,
+            name: string,
+            frontText: string,
+            direction: "outbound" | "inbound",
+          }
+        }[]
+      }[]
+    }
+  }
+};
+
 export type BusLine = {
   id: string;
   name: string;
